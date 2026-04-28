@@ -9,25 +9,50 @@ public class LedgerApp {
         Scanner scanner = new Scanner(System.in);
         String choice;
 
+        ArrayList<Transaction> transactions = new ArrayList<>();
 
-        while (true) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("transactions.csv"));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split("\\|");
 
-            System.out.println("\n=== HOME SCREEN ===");
-            System.out.println("D) Add Deposit");
-            System.out.println("P) Make Payment");
-            System.out.println("L) Ledger");
-            System.out.println("X) Exit");
-            System.out.print("Choose an option: ");
+                if (parts[0].equalsIgnoreCase("date")) {
+                    continue;
+                }
 
-            choice = scanner.nextLine().toUpperCase();
+                String date = parts[0];
+                String time = parts[1];
+                String description = parts[2];
+                String vendor = parts[3];
+                double amount = Double.parseDouble(parts[4]);
 
-            if (choice.equals("X")) {
-                System.out.println("Goodbye!");
-                break;
+                Transaction t = new Transaction(date, time, description, vendor, amount);
+                transactions.add(t);
             }
+            reader.close();
+        } catch (Exception e) {
+            System.out.println("Error reading file");
+        }
+        System.out.println("Loaded: " + transactions.size() + " transactions");
+            while (true) {
 
-            System.out.println("You chose: " + choice);
+                System.out.println("\n=== HOME SCREEN ===");
+                System.out.println("D) Add Deposit");
+                System.out.println("P) Make Payment");
+                System.out.println("L) Ledger");
+                System.out.println("X) Exit");
+                System.out.print("Choose an option: ");
+
+                choice = scanner.nextLine().toUpperCase();
+
+                if (choice.equals("X")) {
+                    System.out.println("Goodbye!");
+                    break;
+                }
+
+                System.out.println("You chose: " + choice);
+            }
         }
     }
-}
 
