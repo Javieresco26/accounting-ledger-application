@@ -35,6 +35,9 @@ public class LedgerApp {
             System.out.println("Error reading file");
         }
         System.out.println("Loaded: " + transactions.size() + " transactions");
+
+        //HOME SCREEN
+
             while (true) {
 
                 System.out.println("\n=== HOME SCREEN ===");
@@ -51,8 +54,48 @@ public class LedgerApp {
                     break;
                 }
 
-                System.out.println("You chose: " + choice);
+                if (choice.equals("L")) {
+                    runLedgerScreen(transactions);
+                } else {
+                    System.out.println("You chose: " + choice);
+                }
             }
         }
-    }
 
+    public static void runLedgerScreen(ArrayList<Transaction> transactions) {
+        Scanner scanner = new Scanner(System.in);
+        String choice;
+        boolean running = true;
+
+        while (running) {
+            System.out.println("\n=== LEDGER SCREEN ===");
+            System.out.println("A) All Transactions");
+            System.out.println("H) Home");
+            System.out.print("Choose an option: ");
+
+            choice = scanner.nextLine().toUpperCase();
+
+            switch (choice) {
+                case "A":
+                    for (Transaction t : transactions) {
+                        System.out.printf("%s %s | %s | %s | $%.2f%n",
+                                t.getDate(),
+                                t.getTime(),
+                                t.getDescription(),
+                                t.getVendor(),
+                                t.getAmount());
+                    }
+                    break;
+
+                case "H":
+                    running = false;
+                    break;
+
+                default:
+                    System.out.println("Invalid option");
+                    break;
+            }
+
+        }
+    }
+}
