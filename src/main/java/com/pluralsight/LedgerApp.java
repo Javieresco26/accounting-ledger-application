@@ -56,12 +56,16 @@ public class LedgerApp {
 
                 if (choice.equals("L")) {
                     runLedgerScreen(transactions);
-                } else {
+                }
+                else if (choice.equals("D")) {
+                    addDeposit(transactions);
+                }
+                else {
                     System.out.println("You chose: " + choice);
                 }
             }
         }
-
+        //// LEDGER SCREEN
     public static void runLedgerScreen(ArrayList<Transaction> transactions) {
         Scanner scanner = new Scanner(System.in);
         String choice;
@@ -97,5 +101,32 @@ public class LedgerApp {
             }
 
         }
+    }
+    //// DEPOSIT
+    public static void addDeposit(ArrayList<Transaction> transactions) {
+            Scanner scanner = new Scanner(System.in);
+
+            System.out.print("Enter date: ");
+            String date = scanner.nextLine();
+
+            System.out.print("Enter time: ");
+            String time = scanner.nextLine();
+
+            System.out.print("Enter description: ");
+            String description = scanner.nextLine();
+
+            System.out.print("Enter vendor: ");
+            String vendor = scanner.nextLine();
+
+            System.out.print("Enter amount: ");
+            double amount = Double.parseDouble(scanner.nextLine());
+
+            Transaction deposit = new Transaction(date, time, description, vendor, amount);
+            transactions.add(deposit);
+            System.out.println("Deposit added.");
+
+
+
+
     }
 }
