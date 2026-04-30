@@ -2,8 +2,12 @@ package com.pluralsight;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.time.*;
+
+import static java.lang.String.format;
 
 public class LedgerApp {
 
@@ -29,7 +33,7 @@ public class LedgerApp {
                 String vendor = parts[3];
                 double amount = Double.parseDouble(parts[4]);
 
-                Transaction t = new Transaction(date, time, description, vendor, amount);
+                Transaction t = new Transaction(LocalDate.parse(date),LocalTime.parse(time), description, vendor, amount);
                 transactions.add(t);
             }
             reader.close();
@@ -79,8 +83,10 @@ public class LedgerApp {
         while (running) {
             System.out.println("\n=== LEDGER SCREEN ===");
             System.out.println("A) All Transactions");
-            System.out.println("H) Home");
+            System.out.println("D) Deposit");
             System.out.println("P) Payments");
+            System.out.println("R) Reports");
+            System.out.println("H) Home");
             System.out.print("Choose an option: ");
 
             choice = scanner.nextLine().toUpperCase();
@@ -97,6 +103,33 @@ public class LedgerApp {
                     }
                     break;
 
+                case "P":
+                    for (Transaction t : transactions) {
+                        if (t.getAmount()<0) {
+                            System.out.printf("%s %s | %s | %s | $%.2f%n",
+                                    t.getDate(),
+                                    t.getTime(),
+                                    t.getDescription(),
+                                    t.getVendor(),
+                                    t.getAmount());
+                        }
+                    }
+                    break;
+                case "D":
+                    for (Transaction t : transactions) {
+                        if (t.getAmount()>0) {
+                            System.out.printf("%s %s | %s | %s | $%.2f%n",
+                                    t.getDate(),
+                                    t.getTime(),
+                                    t.getDescription(),
+                                    t.getVendor(),
+                                    t.getAmount());
+                        }
+                    }
+                    break;
+                case "R":
+                    runReportsScreen();
+
                 case "H":
                     running = false;
                     break;
@@ -108,14 +141,74 @@ public class LedgerApp {
 
         }
     }
+
+    private static void runReportsScreen() {
+        String choice;
+        boolean running = true;
+
+        while (running) {
+            System.out.println("\n=== Reports SCREEN ===");
+            System.out.println("1)  Month To Date");
+            System.out.println("2) Previous Month");
+            System.out.println("3) Year To Date");
+            System.out.println("4)Previous Year");
+            System.out.println("5) Search by Vendor");
+            System.out.println("0) Back");
+            System.out.print("Choose an option: ");
+
+        }
+        choice = scanner.nextLine().toUpperCase();
+
+        switch (choice) {
+            case "1":
+                runMonthToDateReport();
+                break;
+
+            case "2":
+                runPreviousMonth();
+                break;
+            case "3":
+                runYearTodate();
+                break;
+            case "4":
+                runPreviousYear();
+                break;
+
+            case "5":
+                runSearchByVendor();
+                break;
+
+            case "0":
+                running = false;
+                break;
+
+            default:
+                System.out.println("Invalid option");
+                break;
+        }
+    }
+
+    private static void runSearchByVendor() {
+    }
+
+    private static void runPreviousYear() {
+    }
+
+    private static void runYearTodate() {
+    }
+
+    private static void runPreviousMonth() {
+    }
+
+    private static void runMonthToDateReport() {
+    }
+
     //// DEPOSIT
     public static void addDeposit() {
 
-            System.out.print("Enter date: ");
-            String date = scanner.nextLine();
+            LocalDate date = LocalDate.now();
 
-            System.out.print("Enter time: ");
-            String time = scanner.nextLine();
+            LocalTime time = LocalTime.now();
 
             System.out.print("Enter description: ");
             String description = scanner.nextLine();
@@ -135,10 +228,11 @@ public class LedgerApp {
 
 
     }
+    /// payment
     public static void makePayment() {
 
         System.out.print("Enter date: ");
-        String date = scanner.nextLine();
+        String date = scanner.nextLine(); //Fix later. Do excatly as deposit screen
 
         System.out.print("Enter time: ");
         String time = scanner.nextLine();
@@ -152,23 +246,24 @@ public class LedgerApp {
         System.out.print("Enter amount: ");
         double amount = Double.parseDouble(scanner.nextLine());
         amount = -amount;
-        Transaction payment = new Transaction(date, time, description, vendor, amount);
+        Transaction payment = new Transaction(LocalDate.parse(date), LocalTime.parse(time), description, vendor, amount);
         transactions.add(payment);
         saveTransaction(payment);
         System.out.println("Payment added.");
 
     }
+    /// save transactions / add to csv file
     public static void saveTransaction(Transaction t) {
-
+        DateTimeFormatter timeFormater = DateTimeFormatter.ofPattern("HH:mm:ss");
         try {
             FileWriter writer = new FileWriter("transactions.csv", true);
 
             writer.write(
-                    t.getDate() + "|" +
-                            t.getTime() + "|" +
-                            t.getDescription() + "|" +
-                            t.getVendor() + "|" +
-                            t.getAmount() + "\n"
+                    format("%s|%s|%s|%s|%.2f\n",t.getDate(),
+                            t.getTime().format(timeFormater),
+                            t.getDescription(),
+                            t.getVendor(),
+                            t.getAmount())
             );
 
             writer.close();
