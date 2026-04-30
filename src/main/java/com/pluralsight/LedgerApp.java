@@ -1,15 +1,17 @@
 package com.pluralsight;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class LedgerApp {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        String choice;
 
-        ArrayList<Transaction> transactions = new ArrayList<>();
+    static Scanner scanner = new Scanner(System.in);
+    static ArrayList<Transaction> transactions = new ArrayList<>();
+
+    public static void main(String[] args) {
+        String choice;
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader("transactions.csv"));
@@ -55,19 +57,22 @@ public class LedgerApp {
                 }
 
                 if (choice.equals("L")) {
-                    runLedgerScreen(transactions);
+                    runLedgerScreen();
                 }
                 else if (choice.equals("D")) {
-                    addDeposit(transactions);
+                    addDeposit();
+                }
+
+                else if (choice.equals("P")) {
+                    makePayment();
                 }
                 else {
-                    System.out.println("You chose: " + choice);
+                    System.out.println("Invalid option");
                 }
             }
         }
         //// LEDGER SCREEN
-    public static void runLedgerScreen(ArrayList<Transaction> transactions) {
-        Scanner scanner = new Scanner(System.in);
+    public static void runLedgerScreen(){
         String choice;
         boolean running = true;
 
@@ -75,6 +80,7 @@ public class LedgerApp {
             System.out.println("\n=== LEDGER SCREEN ===");
             System.out.println("A) All Transactions");
             System.out.println("H) Home");
+            System.out.println("P) Payments");
             System.out.print("Choose an option: ");
 
             choice = scanner.nextLine().toUpperCase();
@@ -103,8 +109,7 @@ public class LedgerApp {
         }
     }
     //// DEPOSIT
-    public static void addDeposit(ArrayList<Transaction> transactions) {
-            Scanner scanner = new Scanner(System.in);
+    public static void addDeposit() {
 
             System.out.print("Enter date: ");
             String date = scanner.nextLine();
@@ -123,10 +128,56 @@ public class LedgerApp {
 
             Transaction deposit = new Transaction(date, time, description, vendor, amount);
             transactions.add(deposit);
+            saveTransaction(deposit);
             System.out.println("Deposit added.");
 
 
 
 
     }
+    public static void makePayment() {
+
+        System.out.print("Enter date: ");
+        String date = scanner.nextLine();
+
+        System.out.print("Enter time: ");
+        String time = scanner.nextLine();
+
+        System.out.print("Enter description: ");
+        String description = scanner.nextLine();
+
+        System.out.print("Enter vendor: ");
+        String vendor = scanner.nextLine();
+
+        System.out.print("Enter amount: ");
+        double amount = Double.parseDouble(scanner.nextLine());
+        amount = -amount;
+        Transaction payment = new Transaction(date, time, description, vendor, amount);
+        transactions.add(payment);
+        saveTransaction(payment);
+        System.out.println("Payment added.");
+
+    }
+    public static void saveTransaction(Transaction t) {
+
+        try {
+            FileWriter writer = new FileWriter("transactions.csv", true);
+
+            writer.write(
+                    t.getDate() + "|" +
+                            t.getTime() + "|" +
+                            t.getDescription() + "|" +
+                            t.getVendor() + "|" +
+                            t.getAmount() + "\n"
+            );
+
+            writer.close();
+
+        } catch (Exception e) {
+            System.out.println("Error saving transaction");
+        }
+    }
+
+
 }
+
