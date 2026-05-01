@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.time.*;
-
 import static java.lang.String.format;
 
 public class LedgerApp {
@@ -129,6 +128,7 @@ public class LedgerApp {
                     break;
                 case "R":
                     runReportsScreen();
+                    break;
 
                 case "H":
                     running = false;
@@ -151,12 +151,12 @@ public class LedgerApp {
             System.out.println("1)  Month To Date");
             System.out.println("2) Previous Month");
             System.out.println("3) Year To Date");
-            System.out.println("4)Previous Year");
+            System.out.println("4) Previous Year");
             System.out.println("5) Search by Vendor");
             System.out.println("0) Back");
             System.out.print("Choose an option: ");
 
-        }
+
         choice = scanner.nextLine().toUpperCase();
 
         switch (choice) {
@@ -185,22 +185,110 @@ public class LedgerApp {
             default:
                 System.out.println("Invalid option");
                 break;
+            }
+        }
+    }
+
+    private static void runMonthToDateReport() {
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter timeFormater = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+        for (Transaction t : transactions) {
+            if (t.getDate().getMonthValue() == today.getMonthValue()
+                    && t.getDate().getYear() == today.getYear()){
+
+                System.out.printf("%s|%s|%s|%s|%.2f\n",
+                        t.getDate(),
+                        t.getTime().format(timeFormater),
+                        t.getDescription(),
+                        t.getVendor(),
+                        t.getAmount());
+
+            }
+        }
+
+    }
+
+    private static void runPreviousMonth() {
+        LocalDate today = LocalDate.now();
+        LocalDate previousMonth = LocalDate.now().minusMonths(1);
+        DateTimeFormatter timeFormater = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+        for (Transaction t : transactions) {
+            if (t.getDate().getMonthValue() == previousMonth.getMonthValue()
+                    && t.getDate().getYear() == previousMonth.getYear()) {
+
+                System.out.printf("%s|%s|%s|%s|%.2f%n",
+                        t.getDate(),
+                        t.getTime().format(timeFormater),
+                        t.getDescription(),
+                        t.getVendor(),
+                        t.getAmount());
+            }
+        }
+    }
+
+    private static void runYearTodate() {
+        LocalDate today = LocalDate.now();
+        LocalDate previousMonth = LocalDate.now().minusMonths(1);
+        DateTimeFormatter timeFormater = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+        for (Transaction t : transactions) {
+            if (t.getDate().getYear() == today.getYear()){
+
+                System.out.printf("%s|%s|%s|%s|%.2f%n",
+                        t.getDate(),
+                        t.getTime().format(timeFormater),
+                        t.getDescription(),
+                        t.getVendor(),
+                        t.getAmount());
+            }
+        }
+    }
+
+    private static void runPreviousYear() {
+        LocalDate today = LocalDate.now();
+        LocalDate previousYear = LocalDate.now().minusYears(1);
+        DateTimeFormatter timeFormater = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+        for (Transaction t : transactions) {
+            if (t.getDate().getYear() == previousYear.getYear()){
+
+
+                System.out.printf("%s|%s|%s|%s|%.2f%n",
+                        t.getDate(),
+                        t.getTime().format(timeFormater),
+                        t.getDescription(),
+                        t.getVendor(),
+                        t.getAmount());
+            }
         }
     }
 
     private static void runSearchByVendor() {
-    }
+        System.out.print("Enter vendor name to search: ");
+        String searchVendor = scanner.nextLine();
 
-    private static void runPreviousYear() {
-    }
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    private static void runYearTodate() {
-    }
+        boolean found = false;
 
-    private static void runPreviousMonth() {
-    }
+        for (Transaction t : transactions) {
+            if ((t.getVendor().equalsIgnoreCase(searchVendor))) {
+                System.out.printf("%s|%s|%s|%s|%.2f%n",
+                        t.getDate(),
+                        t.getTime().format(timeFormatter),
+                        t.getDescription(),
+                        t.getVendor(),
+                        t.getAmount());
+                found = true;
 
-    private static void runMonthToDateReport() {
+            }
+        }
+
+        if (!found) {
+            System.out.println("No transactions found for vendor: " + searchVendor);
+        }
     }
 
     //// DEPOSIT
@@ -231,11 +319,9 @@ public class LedgerApp {
     /// payment
     public static void makePayment() {
 
-        System.out.print("Enter date: ");
-        String date = scanner.nextLine(); //Fix later. Do excatly as deposit screen
+        LocalDate date = LocalDate.now();
 
-        System.out.print("Enter time: ");
-        String time = scanner.nextLine();
+        LocalTime time = LocalTime.now();
 
         System.out.print("Enter description: ");
         String description = scanner.nextLine();
@@ -246,7 +332,7 @@ public class LedgerApp {
         System.out.print("Enter amount: ");
         double amount = Double.parseDouble(scanner.nextLine());
         amount = -amount;
-        Transaction payment = new Transaction(LocalDate.parse(date), LocalTime.parse(time), description, vendor, amount);
+        Transaction payment = new Transaction(date,time, description, vendor, amount);
         transactions.add(payment);
         saveTransaction(payment);
         System.out.println("Payment added.");
